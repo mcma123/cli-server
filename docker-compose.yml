@@ -1,0 +1,22 @@
+services:
+  cli_runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    working_dir: /srv/cli-runner
+    expose:
+      - "3000"
+    environment:
+      PORT: "3000"
+      CLI_HOME: /opt/cli-tools
+      GO_VERSION: 1.25.0
+      CLI_RUNNER_API_KEY: ${CLI_RUNNER_API_KEY}
+      PATH: /opt/cli-tools/go/bin:/opt/cli-tools/bin:/opt/cli-tools/.local/bin:/opt/cli-tools/npm-global/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    volumes:
+      - cli_runner_tools:/opt/cli-tools
+      - cli_runner_app:/app
+
+volumes:
+  cli_runner_tools:
+  cli_runner_app:
