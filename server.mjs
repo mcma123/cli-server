@@ -130,8 +130,10 @@ async function installTool(tool) {
   );
 
   const registry = readRegistry();
+  const binaryName = toolToBinary(tool);
+  const fullPath = `/root/.local/bin/${binaryName}`;
   registry[tool] = {
-    binary: toolToBinary(tool),
+    binary: fullPath,
     installed_at: new Date().toISOString(),
   };
   writeRegistry(registry);
@@ -226,3 +228,4 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`CLI runner listening on :${PORT}`);
 });
+
