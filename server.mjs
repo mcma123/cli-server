@@ -172,6 +172,7 @@ const server = http.createServer(async (req, res) => {
         service: "cli-runner",
         has_api_key: Boolean(API_KEY),
         tools: readRegistry(),
+        path: process.env.PATH,
       });
     }
 
