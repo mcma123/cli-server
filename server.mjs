@@ -197,6 +197,36 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
+    if (req.method === "POST" && req.url === "/delete") {
+      const body = await readBody(req);
+      const tool = body?.tool;
+      if (!tool || typeof tool !== "string") {
+        return json(res, 400, { ok: false, error: "tool is required" });
+      }
+
+      const registry = readRegistry();
+      const entry = registry[tool];
+
+      const candidates = [
+        entry?.binary,
+        `/root/.local/bin/${tool}-pp-cli`,
+        `${CLI_HOME}/bin/${tool}-pp-cli`,
+        `${CLI_HOME}/.local/bin/${tool}-pp-cli`,
+        `${CLI_HOME}/npm-global/bin/${tool}-pp-cli`,
+      ].filter(Boolean);
+
+      for (const file of candidates) {
+        try {
+          fs.rmSync(file, { force: true });
+        } catch {}
+      }
+
+      delete registry[tool];
+      writeRegistry(registry);
+
+      return json(res, 200, { ok: true, deleted: tool });
+    }
+
     if (req.method === "POST" && req.url === "/run") {
       const body = await readBody(req);
       const tool = body?.tool;
@@ -228,4 +258,5 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`CLI runner listening on :${PORT}`);
 });
+
 
